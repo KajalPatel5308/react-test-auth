@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import base from 'base-64';
+import { Link, withRouter } from 'react-router-dom';
 import { FormGroup, Label } from 'reactstrap';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
@@ -12,7 +13,7 @@ import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
 import messages from './messages';
 import { changeEmail, changePassowrd } from './actions';
-import { makeSelectEmail } from './selectors';
+import { makeSelectEmail, makeSelectPassword } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 // import { Field, reduxForm, getFormSyncErrors } from 'redux-form';
@@ -83,13 +84,27 @@ export class LoginPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
+      isError: false,
     };
   }
 
-  onEmailChange = evt => {
-    this.setState({ email: evt.target.value });
-    this.props.onChangeEmail(evt);
+  onHandleSubmit = evt => {
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+    const users = JSON.parse(localStorage.getItem('users'));
+    const userInfo = {
+      email: this.props.email,
+      password: this.props.password,
+    };
+    const token = base.encode(userInfo);
+    const isAuthanticated = users.find(
+      user => user.authToken === token && user.email === this.props.email,
+    );
+    if (isAuthanticated) {
+      localStorage.setItem('loginData', JSON.stringify(isAuthanticated));
+      this.props.history.push('/home');
+    } else {
+      this.setState({ isError: true });
+    }
   };
 
   render() {
@@ -103,7 +118,10 @@ export class LoginPage extends React.Component {
             content={messages.metaDescriptions.defaultMessage}
           />
         </Helmet>
-        <Form onSubmit={this.props.onSubmitForm}>
+        <Form onSubmit={this.onHandleSubmit}>
+          {this.state.isError && (
+            <span>Please enter valid email and password</span>
+          )}
           <FormGroup>
             <Label htmlFor="email">
               <FormattedMessage {...messages.email} />
@@ -111,8 +129,8 @@ export class LoginPage extends React.Component {
             <div className="form-control-validated">
               <Input
                 className="form-control"
-                value={this.state.email}
-                onChange={this.onEmailChange}
+                value={this.props.email}
+                onChange={this.props.onChangeEmail}
                 placeholder=""
                 type="email"
               />
@@ -125,7 +143,7 @@ export class LoginPage extends React.Component {
             <div className="form-control-validated">
               <Input
                 className="form-control"
-                value={this.state.password}
+                value={this.props.password}
                 onChange={this.props.onChangePassword}
                 placeholder=""
                 type="password"
@@ -150,22 +168,19 @@ LoginPage.propTypes = {
   email: PropTypes.string,
   onChangeEmail: PropTypes.func,
   onChangePassword: PropTypes.func,
+  history: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
 };
 
 export function mapDispatchToProps(dispatch) {
   return {
     onChangeEmail: evt => dispatch(changeEmail(evt.target.value)),
     onChangePassword: evt => dispatch(changePassowrd(evt.target.value)),
-    onSubmitForm: evt => {
-      if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-      console.log('onSubmitForm');
-      //   dispatch(loadRepos());
-    },
   };
 }
 
 const mapStateToProps = createStructuredSelector({
   email: makeSelectEmail(),
+  password: makeSelectPassword(),
 });
 
 const withConnect = connect(
@@ -180,4 +195,4 @@ export default compose(
   withReducer,
   withSaga,
   withConnect,
-)(LoginPage);
+)(withRouter(LoginPage));

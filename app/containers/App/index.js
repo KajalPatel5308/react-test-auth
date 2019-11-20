@@ -14,7 +14,8 @@ import { Switch, Route } from 'react-router-dom';
 import HomePage from 'containers/HomePage/Loadable';
 import LoginPage from 'containers/LoginPage/Loadable';
 import SignupPage from 'containers/SignupPage/Loadable';
-import FeaturePage from 'containers/FeaturePage/Loadable';
+import ProfilePage from 'containers/ProfilePage/Loadable';
+// import FeaturePage from 'containers/FeaturePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 // import Header from 'components/Header';
 // import Footer from 'components/Footer';
@@ -30,6 +31,7 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
+const userExist = () => localStorage.getItem('loginData');
 export default function App() {
   return (
     <AppWrapper>
@@ -41,10 +43,10 @@ export default function App() {
       </Helmet>
       {/* <Header /> */}
       <Switch>
-        <Route exact path="/" component={HomePage} />
-        <Route exact path="/login" component={LoginPage} />
+        <Route exact path="/" component={LoginPage} />
         <Route exact path="/signup" component={SignupPage} />
-        <Route path="/features" component={FeaturePage} />
+        <Route exact path="/profile" component={ProfilePage} />
+        {userExist() && <Route exact path="/home" component={HomePage} />}
         <Route path="" component={NotFoundPage} />
       </Switch>
       {/* <Footer /> */}

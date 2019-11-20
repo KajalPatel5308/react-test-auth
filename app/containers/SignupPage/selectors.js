@@ -12,4 +12,16 @@ const makeSelectEmail = () =>
 const makeSelectPassword = () =>
   createSelector(selectLogin, State => State.get('password'));
 
-export { selectLogin, makeSelectEmail, makeSelectPassword };
+const makeSelectFirstName = () =>
+  createSelector(selectLogin, State => State.get('firstName'));
+
+const makeSelectLastName = () =>
+  createSelector(selectLogin, State => State.get('lastName'));
+
+export {
+  selectLogin,
+  makeSelectEmail,
+  makeSelectPassword,
+  makeSelectFirstName,
+  makeSelectLastName,
+};

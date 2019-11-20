@@ -3,6 +3,7 @@ import {
   CHANGE_PASSWORD,
   CHANGE_FIRST_NAME,
   CHANGE_LAST_NAME,
+  SUBMIT_SIGNUP,
 } from './constants';
 
 export function changeFirstName(firstName) {
@@ -30,5 +31,12 @@ export function changePassowrd(password) {
   return {
     type: CHANGE_PASSWORD,
     password,
+  };
+}
+
+export function onSubmitSignupForm(data) {
+  return {
+    type: SUBMIT_SIGNUP,
+    data,
   };
 }

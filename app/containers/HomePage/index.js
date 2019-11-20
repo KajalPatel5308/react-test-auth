@@ -10,8 +10,9 @@ import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
+import { Link, withRouter } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
-
+import styled from 'styled-components';
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
 import {
@@ -33,6 +34,53 @@ import { makeSelectUsername } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 
+const Button = styled('button')`
+  display: inline-flex;
+  padding: 0.25em 2em;
+  margin: 1em;
+  text-decoration: none;
+  border-radius: 4px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-touch-callout: none;
+  user-select: none;
+  cursor: pointer;
+  outline: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  border: 2px solid #41addd;
+  color: #41addd;
+
+  &:active {
+    background: #41addd;
+    color: #fff;
+  }
+`;
+Button.displayName = 'Button';
+
+const ButtonLink = styled(Link)`
+  display: inline-flex;
+  padding: 0.25em 2em;
+  margin: 1em;
+  text-decoration: none;
+  border-radius: 4px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-touch-callout: none;
+  user-select: none;
+  cursor: pointer;
+  outline: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  border: 2px solid #41addd;
+  color: #41addd;
+
+  &:active {
+    background: #41addd;
+    color: #fff;
+  }
+`;
+ButtonLink.displayName = 'ButtonLink';
 /* eslint-disable react/prefer-stateless-function */
 export class HomePage extends React.PureComponent {
   /**
@@ -43,6 +91,11 @@ export class HomePage extends React.PureComponent {
       this.props.onSubmitForm();
     }
   }
+
+  handleLogout = () => {
+    localStorage.removeItem('loginData');
+    this.props.history.push('/');
+  };
 
   render() {
     const { loading, error, repos } = this.props;
@@ -91,6 +144,14 @@ export class HomePage extends React.PureComponent {
             </Form>
             <ReposList {...reposListProps} />
           </Section>
+          <div>
+            <Button onClick={this.handleLogout}>
+              <FormattedMessage {...messages.logout} />
+            </Button>
+            <ButtonLink to="/profile">
+              <FormattedMessage {...messages.profile} />
+            </ButtonLink>
+          </div>
         </div>
       </article>
     );
@@ -135,4 +196,4 @@ export default compose(
   withReducer,
   withSaga,
   withConnect,
-)(HomePage);
+)(withRouter(HomePage));

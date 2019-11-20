@@ -1,32 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import base from 'base-64';
 import { FormGroup, Label } from 'reactstrap';
 import { Helmet } from 'react-helmet';
 import { FormattedMessage } from 'react-intl';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 import styled from 'styled-components';
-import { createStructuredSelector } from 'reselect';
-import injectReducer from 'utils/injectReducer';
-import injectSaga from 'utils/injectSaga';
 import messages from './messages';
-import {
-  changeEmail,
-  changePassowrd,
-  changeFirstName,
-  changeLastName,
-  onSubmitSignupForm,
-} from './actions';
-import {
-  makeSelectEmail,
-  makeSelectPassword,
-  makeSelectFirstName,
-  makeSelectLastName,
-} from './selectors';
-import reducer from './reducer';
-import saga from './saga';
 // import { Field, reduxForm, getFormSyncErrors } from 'redux-form';
 // import { connect } from 'react-redux';
 
@@ -91,22 +69,100 @@ const ButtonLink = styled(Link)`
 `;
 ButtonLink.displayName = 'ButtonLink';
 
-export class SignupPage extends React.Component {
+export class ProfilePage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      age: '',
+      address: '',
+    };
+  }
+
+  componentWillMount() {
+    const loginUser = JSON.parse(localStorage.getItem('loginData'));
+    // const userInfo =
+    this.setState({
+      firstName: loginUser.firstName,
+      lastName: loginUser.lastName,
+      email: loginUser.email,
+      age: loginUser.age,
+      address: loginUser.address,
+    });
+  }
+
+  onChangeFirstName = evt => {
+    this.setState({
+      firstName: evt.target.value,
+    });
+  };
+
+  onChangeLastName = evt => {
+    this.setState({
+      lastName: evt.target.value,
+    });
+  };
+
+  onChangeEmail = evt => {
+    this.setState({
+      email: evt.target.value,
+    });
+  };
+
+  onChangeAge = evt => {
+    this.setState({
+      age: evt.target.value,
+    });
+  };
+
+  onChangeAddress = evt => {
+    this.setState({
+      address: evt.target.value,
+    });
+  };
+
+  onImageChange = e => {
+    if (e.target.files[0] !== undefined) {
+      const file = e.target.files[0];
+      const regex = new RegExp('(.*?).(png|jpg|jpeg)$');
+      const reader = new FileReader();
+      if (regex.test(file.type)) {
+        reader.onloadend = () => {
+          const image = new Image();
+          image.src = reader.result;
+          image.onload = () => {
+            this.setState({
+              file,
+            });
+          };
+        };
+      }
+    }
+  };
+
   onHandleSubmit = evt => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
-    const data = {
-      firstName: this.props.firstName,
-      lastName: this.props.lastName,
-      email: this.props.email,
-      password: this.props.password,
+    const loginUser = JSON.parse(localStorage.getItem('loginData'));
+    const userInfo = {
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      age: this.state.age,
+      address: this.state.address,
+      file: this.state.file,
+      authToken: loginUser.authToken,
     };
-    const loginData = {
-      email: this.props.email,
-      password: this.props.password,
-    };
-    const authToken = base.encode(loginData);
-    data.authToken = authToken;
-    this.props.onSubmitForm(data);
+    const users = JSON.parse(localStorage.getItem('users'));
+    const userArray = users.map(user => {
+      if (user.authToken === userInfo.authToken) {
+        return userInfo;
+      }
+      return user;
+    });
+    localStorage.setItem('loginData', JSON.stringify(userInfo));
+    localStorage.setItem('users', JSON.stringify(userArray));
   };
 
   render() {
@@ -128,8 +184,8 @@ export class SignupPage extends React.Component {
             <div className="form-control-validated">
               <Input
                 className="form-control"
-                value={this.props.firstName}
-                onChange={this.props.onChangeFirstName}
+                value={this.state.firstName}
+                onChange={this.onChangeFirstName}
                 placeholder=""
                 type="text"
               />
@@ -142,8 +198,8 @@ export class SignupPage extends React.Component {
             <div className="form-control-validated">
               <Input
                 className="form-control"
-                value={this.props.lastName}
-                onChange={this.props.onChangeLastName}
+                value={this.state.lastName}
+                onChange={this.onChangeLastName}
                 placeholder=""
                 type="text"
               />
@@ -156,30 +212,57 @@ export class SignupPage extends React.Component {
             <div className="form-control-validated">
               <Input
                 className="form-control"
-                value={this.props.email}
-                onChange={this.props.onChangeEmail}
+                value={this.state.email}
+                onChange={this.onChangeEmail}
                 placeholder=""
                 type="email"
               />
             </div>
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="password">
-              <FormattedMessage {...messages.password} />
+            <Label htmlFor="age">
+              <FormattedMessage {...messages.age} />
             </Label>
             <div className="form-control-validated">
               <Input
                 className="form-control"
-                value={this.props.password}
-                onChange={this.props.onChangePassword}
+                value={this.state.age}
+                onChange={this.onChangeAge}
                 placeholder=""
-                type="password"
+                type="number"
+              />
+            </div>
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="address">
+              <FormattedMessage {...messages.address} />
+            </Label>
+            <div className="form-control-validated">
+              <Input
+                className="form-control"
+                value={this.state.address}
+                onChange={this.onChangeAddress}
+                placeholder=""
+                type="text"
+              />
+            </div>
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="address">
+              <FormattedMessage {...messages.address} />
+            </Label>
+            <div className="form-control-validated">
+              <Input
+                className="fileInput"
+                type="file"
+                accept=".jpeg,.jpg,.png,.bmp"
+                onChange={this.onImageChange}
               />
             </div>
           </FormGroup>
           <div>
             <Button type="submit">
-              <FormattedMessage {...messages.signup} />
+              <FormattedMessage {...messages.save} />
             </Button>
           </div>
         </Form>
@@ -187,40 +270,5 @@ export class SignupPage extends React.Component {
     );
   }
 }
-SignupPage.propTypes = {
-  onSubmitForm: PropTypes.func,
-  email: PropTypes.string,
-  onChangeEmail: PropTypes.func,
-  onChangePassword: PropTypes.func,
-};
 
-export function mapDispatchToProps(dispatch) {
-  return {
-    onChangeFirstName: evt => dispatch(changeFirstName(evt.target.value)),
-    onChangeLastName: evt => dispatch(changeLastName(evt.target.value)),
-    onChangeEmail: evt => dispatch(changeEmail(evt.target.value)),
-    onChangePassword: evt => dispatch(changePassowrd(evt.target.value)),
-    onSubmitForm: data => dispatch(onSubmitSignupForm(data)),
-  };
-}
-
-const mapStateToProps = createStructuredSelector({
-  email: makeSelectEmail(),
-  password: makeSelectPassword(),
-  firstName: makeSelectFirstName(),
-  lastName: makeSelectLastName(),
-});
-
-const withConnect = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-);
-
-const withReducer = injectReducer({ key: 'login', reducer });
-const withSaga = injectSaga({ key: 'login', saga });
-
-export default compose(
-  withReducer,
-  withSaga,
-  withConnect,
-)(SignupPage);
+export default ProfilePage;

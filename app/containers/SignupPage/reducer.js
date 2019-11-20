@@ -5,10 +5,14 @@ import {
   CHANGE_PASSWORD,
   CHANGE_FIRST_NAME,
   CHANGE_LAST_NAME,
+  SUBMIT_SIGNUP,
 } from './constants';
 
 export const initialState = fromJS({
   email: '',
+  firstName: '',
+  lastName: '',
+  password: '',
 });
 
 function login(state = initialState, action) {
@@ -16,11 +20,14 @@ function login(state = initialState, action) {
     case CHANGE_EMAIL:
       return state.set('email', action.email);
     case CHANGE_LAST_NAME:
-      return state.set('email', action.lastName);
+      return state.set('lastName', action.lastName);
     case CHANGE_FIRST_NAME:
-      return state.set('email', action.firstName);
+      return state.set('firstName', action.firstName);
     case CHANGE_PASSWORD:
       return state.set('password', action.password);
+    case SUBMIT_SIGNUP:
+      localStorage.setItem('loginData', JSON.stringify(action.data));
+      return state;
     default:
       return state;
   }

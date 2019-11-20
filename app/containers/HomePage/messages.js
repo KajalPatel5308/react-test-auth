@@ -29,4 +29,12 @@ export default defineMessages({
     id: `${scope}.tryme.atPrefix`,
     defaultMessage: '@',
   },
+  logout: {
+    id: `${scope}.tryme.logout`,
+    defaultMessage: 'Log Out',
+  },
+  profile: {
+    id: `${scope}.tryme.Profile`,
+    defaultMessage: 'Profile',
+  },
 });

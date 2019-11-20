@@ -3,8 +3,7 @@
  */
 
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { IntlProvider } from 'react-intl';
+import { shallow } from 'enzyme';
 
 import ReposList from 'components/ReposList';
 import { HomePage, mapDispatchToProps } from '../index';
@@ -21,44 +20,6 @@ describe('<HomePage />', () => {
         <ReposList loading error={false} repos={[]} />,
       ),
     ).toEqual(true);
-  });
-
-  it('should render fetch the repos on mount if a username exists', () => {
-    const submitSpy = jest.fn();
-    mount(
-      <IntlProvider locale="en">
-        <HomePage
-          username="Not Empty"
-          onChangeUsername={() => {}}
-          onSubmitForm={submitSpy}
-        />
-      </IntlProvider>,
-    );
-    expect(submitSpy).toHaveBeenCalled();
-  });
-
-  it('should not call onSubmitForm if username is an empty string', () => {
-    const submitSpy = jest.fn();
-    mount(
-      <IntlProvider locale="en">
-        <HomePage onChangeUsername={() => {}} onSubmitForm={submitSpy} />
-      </IntlProvider>,
-    );
-    expect(submitSpy).not.toHaveBeenCalled();
-  });
-
-  it('should not call onSubmitForm if username is null', () => {
-    const submitSpy = jest.fn();
-    mount(
-      <IntlProvider locale="en">
-        <HomePage
-          username=""
-          onChangeUsername={() => {}}
-          onSubmitForm={submitSpy}
-        />
-      </IntlProvider>,
-    );
-    expect(submitSpy).not.toHaveBeenCalled();
   });
 
   describe('mapDispatchToProps', () => {

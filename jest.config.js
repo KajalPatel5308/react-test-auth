@@ -1,6 +1,7 @@
 module.exports = {
   collectCoverageFrom: [
     'app/**/*.{js,jsx}',
+    '!app/**/*/*saga.{js,jsx}',
     '!app/**/*.test.{js,jsx}',
     '!app/*/RbGenerated*/*.{js,jsx}',
     '!app/app.js',
